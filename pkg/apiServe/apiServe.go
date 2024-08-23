@@ -20,7 +20,9 @@ func NewAPIServe(address string, store *store.MainStore) *APIServe {
 }
 
 func (as *APIServe) Serve(router *gin.Engine) error {
+
 	userServices := users.NewUserServices(as.Store.UserStore)
+	routing.CORSConfig(router)
 	routing.RegisterRouting(router, *userServices)
 	return router.Run(as.Address)
 
