@@ -20,6 +20,18 @@ func NewUserServices(store store.UserStore) *UserServices {
 	}
 }
 
+func (us *UserServices) GetAllUsers(context *gin.Context) {
+
+	users, err := us.Store.GetAllUsers()
+
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+	context.JSON(http.StatusOK, gin.H{"users": users})
+
+}
+
 func (us *UserServices) RegisteUser(context *gin.Context) {
 	var user models.User
 
@@ -108,4 +120,23 @@ func (us *UserServices) Login(context *gin.Context) {
 
 	context.JSON(http.StatusOK, gin.H{"message": "login successfuly", "user": fetshedUser, "token": token})
 
+}
+
+func (us *UserServices) ValidateToken(context *gin.Context) {
+
+	var token string
+
+	err := context.ShouldBind(&token)
+	if err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
+
+	_, err = utils.ValidToken(token)
+
+	if err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
+	context.JSON(http.StatusOK, gin.H{"token": "valid"})
 }

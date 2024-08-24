@@ -9,6 +9,7 @@ import (
 )
 
 type UserStore interface {
+	GetAllUsers() ([]models.User, error)
 	RegisteUser(models.User) (models.User, error)
 	Login(string, string) (models.User, error)
 	IsEmailAlreadyExist(string) (bool, error)
@@ -23,6 +24,27 @@ func NewUserStore(db *sql.DB) *UserStorage {
 	return &UserStorage{
 		db: db,
 	}
+}
+
+func (us *UserStorage) GetAllUsers() ([]models.User, error) {
+	var users []models.User
+	const statement = "SELECT id,email,type,created_at FROM users"
+	rows, err := us.db.Query(statement)
+
+	if err != nil {
+		return nil, err
+	}
+	for rows.Next() {
+		var user models.User
+		err := rows.Scan(&user.ID, &user.Email, &user.Type, &user.CreatedAt)
+		if err != nil {
+			return users, err
+		}
+		users = append(users, user)
+	}
+
+	return users, nil
+
 }
 
 func (us *UserStorage) RegisteUser(user models.User) (models.User, error) {

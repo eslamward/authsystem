@@ -1,34 +1,42 @@
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router'
 import { useRegisterMutation } from '../redux/featcher/auth/authSlice'
-
+import Cookies from "js-cookie"
 function Register() {
 
-    const [register, { isError, isLoading, isSuccess, error }] = useRegisterMutation()
 
+    const [register, { isError, isLoading, isSuccess, error }] = useRegisterMutation()
+    const navigate = useNavigate()
     const [inputValues, setInputValues] = useState({
         email: "",
         password: "",
     })
 
-    const handelSubit = (e) => {
+    const handelSubit = async (e) => {
         e.preventDefault()
-        const { data } = register({
-            email: inputValues.email,
-            password: inputValues.password
-        })
+        try {
+
+            const { data } = await register({
+                email: inputValues.email,
+                password: inputValues.password
+            })
+
+            const token = data.token
+
+            if (token) {
+                Cookies.set("token", token)
+            }
 
 
-        console.log(data)
-        // setInputValues({
-        //     email: "",
-        //     password: ""
-        // })
+            setInputValues({
+                email: "",
+                password: ""
+            })
+            navigate("/users")
+        } catch (error) {
+        }
     }
-    console.log("iserror", isError)
 
-    console.log("error", error)
-    console.log("loading", isLoading)
-    console.log("isSuccess", isSuccess)
 
     return (
         <section className='border-2 w-3/4 p-2 rounded-md mx-auto mt-20'>

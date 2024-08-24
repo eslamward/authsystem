@@ -14,7 +14,7 @@ func GenerateToken(email string, id int) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"email":  email,
 		"userId": id,
-		"exp":    time.Now().Add(time.Hour * 1).Unix(),
+		"exp":    time.Now().Add(time.Second * 60).Unix(),
 	})
 
 	return token.SignedString([]byte(SECRET_KEY))
@@ -32,7 +32,7 @@ func ValidToken(token string) (int, error) {
 	})
 
 	if err != nil {
-		return 0, errors.New("error in parsing the token")
+		return 0, errors.New(err.Error())
 	}
 	validToken := tk.Valid
 
@@ -44,5 +44,5 @@ func ValidToken(token string) (int, error) {
 	if !ok {
 		return 0, errors.New("invalid token claims")
 	}
-	return clamis["userId"].(int), nil
+	return int(clamis["userId"].(float64)), nil
 }
