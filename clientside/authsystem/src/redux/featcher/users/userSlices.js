@@ -9,8 +9,11 @@ export const userSlices = apiSlice.injectEndpoints({
         users: builder.query({
             query: () => ({
                 url: "/users",
-                method: "GET"
-            })
+                method: "GET",
+
+
+            }),
+            keepUnusedDataFor: 5
         }
         )
     })

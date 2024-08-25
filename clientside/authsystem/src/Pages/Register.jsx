@@ -1,11 +1,12 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router'
-import { useRegisterMutation } from '../redux/featcher/auth/authSlice'
+import { useRegisterMutation } from '../redux/featcher/auth/authApiSlice'
 import Cookies from "js-cookie"
+import { Link } from 'react-router-dom'
 function Register() {
 
 
-    const [register, { isError, isLoading, isSuccess, error }] = useRegisterMutation()
+    const [register, { isError, isLoading, error }] = useRegisterMutation()
     const navigate = useNavigate()
     const [inputValues, setInputValues] = useState({
         email: "",
@@ -20,13 +21,14 @@ function Register() {
                 email: inputValues.email,
                 password: inputValues.password
             })
-
             const token = data.token
+            const user = data.user
+            const userEmail = user["email"]
+
 
             if (token) {
-                Cookies.set("token", token)
+                dispatch(setUserData({ userEmail, token }))
             }
-
 
             setInputValues({
                 email: "",
@@ -91,18 +93,26 @@ function Register() {
 
                     ' />
                 </fieldset>
-                <button
-                    type='submit'
-                    className='
-                    w-fit 
-                  bg-orange-600
-                    mx-auto
-                    py-3
-                    px-6
-                    rounded-lg
-                    text-white
-                    hover:bg-orange-700
-               '>Register</button>
+                {isError && error &&
+                    <div className='bg-red-500 text-white font-mono p-4 rounded-md'>{error?.data?.message}</div>}
+
+                <div className='flex items-center'>
+                    <p className='flex-1'>Do You Have Account?
+                        <Link to={"/auth/login"} className='text-blue-500 mx-2'>Login</Link></p>
+                    <button
+                        disabled={isLoading}
+                        type='submit'
+                        className='
+                        w-fit 
+                      bg-orange-600
+                        mx-auto
+                        py-3
+                        px-6
+                        rounded-lg
+                        text-white
+                        hover:bg-orange-700
+                   '>Register</button>
+                </div>
             </form>
         </section>
     )
